@@ -37,9 +37,9 @@ username.addEventListener("input", (e) => {
     const usernameValue = username.value;
 
     // Не включаем Кирилицу и только в этом случае отправляем запрос
-    if (usernameValue.match(/[а-я]/) || usernameValue.match(/[А-Я]/)) {
+    if ((usernameValue.match(/[а-я]/) || usernameValue.match(/[А-Я]/)) || username.value.length < 5) {
         const validation = new validationMessage(
-            'Логин может содержать только латинские символы',
+            'Логин должен содержать не меньше 5 латинских символов',
             'red',
             username,
             'copy'
@@ -165,8 +165,6 @@ form.addEventListener("submit", (e)=>{
     if (!usernameCheck.status && usernameValue.length >= 5 && usernameValue.match(/[a-z]/) && 
     passValue.length >= 8 && passValue.match(/[a-z]/) && passValue.match(/[0-9]/)) {
 
-       
-        
         const formData = new FormData(form);
         // Записываем объект Форм дата в обычный объект для передачи через json
         const object = {};
@@ -185,23 +183,46 @@ form.addEventListener("submit", (e)=>{
         .then(res => res.json())
         .then(res => {
             if (res) {
-                console.log('Ypa1');
+                console.log(res);
                 // Очищаем форму и смс о валидности пароля спустя 2 сек
                 setTimeout(()=>{
                     form.reset();
                     pass.nextElementSibling.remove();
                 }, 2000);
     
-                const submitMessage = 'Поздравляем, вы успешно зарегистрировались!';
                 const validation = new validationMessage(
-                    submitMessage,
+                    'Поздравляем, вы успешно зарегистрировались!',
+                    'green',
+                    form.querySelector('button'),
+                    'copy'
+                );
+            } else {
+                console.log(res);
+                setTimeout(()=>{
+                    pass.nextElementSibling.remove();
+                }, 2000);
+    
+                const validation = new validationMessage(
+                    'Что-то пошло не так.. Попробуйте, пожалуйста, позже',
                     'green',
                     form.querySelector('button'),
                     'copy'
                 );
             }
         })
-        .catch(error => console.log(error));
+        .catch(error => {
+            console.log(error);
+            setTimeout(()=>{
+                pass.nextElementSibling.remove();
+            }, 2000);
+
+            const validation = new validationMessage(
+                'Что-то пошло не так.. Попробуйте, пожалуйста, позже',
+                'green',
+                form.querySelector('button'),
+                'copy'
+            );
+        });
         
     } else {
         if (usernameCheck.status) {
