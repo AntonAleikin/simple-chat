@@ -2,7 +2,8 @@
 
 const form = document.querySelector(".registration__form"),
 pass = form.querySelector('.registration__pass'),
-username = form.querySelector('.registration__username');
+username = form.querySelector('.registration__username'),
+email = form.querySelector('.registration__email');
 
 
 // Класс вывода оповещений о валидности данных, заполняемых в форме 
@@ -29,55 +30,96 @@ class validationMessage {
     }
 }
 
+// Валидация email и username
+function inputValidation (input, check) {
 
-// Проверка на занятость логина и исключение Кирилицы
+    input.addEventListener("input", (e) => {
+        e.preventDefault();
+
+        // Записываем email и username пути к php файлам для чека
+        if (input.classList.contains('registration__email')) {
+            check.path = 'php/email_check.php';
+        } else {
+            check.path = 'php/user_check.php';
+        }
+
+        //const reg = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
+        
+        // Не включаем Кирилицу + валидація и только в этом случае отправляем запрос  
+        const inputValue = input.value;  
+        if ((input.classList.contains('registration__email') && !inputValue.match(/@/)) ||
+            (input.classList.contains('registration__email') && 
+            (inputValue.match(/[а-я]/) || inputValue.match(/[А-Я]/) || inputValue.match(/[A-Z]/) || 
+            inputValue.length < 6))) { 
+
+            const validation = new validationMessage(
+                'Это поле должно быть заполнено в формате email',
+                'red',
+                input,
+                'copy'
+            );
+        } else if (input.classList.contains('registration__username') &&
+            (inputValue.match(/[а-я]/) || inputValue.match(/[А-Я]/) || inputValue.length < 5)) {
+
+            const validation = new validationMessage(
+                'Имя пользователя должно содержать не меньше 5 латинских символов',
+                'red',
+                input,
+                'copy'
+            );
+        } else {
+
+            // Асинхронно проверяем на сервере свободны ли email и username
+            fetch(check.path, {
+                method: "POST",
+                headers: {
+                    'Content-type': 'application/json'
+                },
+                body: JSON.stringify(inputValue)
+            })
+            .then(response => response.json())
+            .then(response => {
+                console.log(response);
+                check.status = response;
+                
+                // Выводим оповещения, если email И username существуют
+                if (response && input.classList.contains('registration__email')) {
+                    console.log(check.status);
+                    const validation = new validationMessage(
+                        'Пользователь с таким email уже существует',
+                        'red',
+                        input,
+                        'copy'
+                    );
+                } else if (response && input.classList.contains('registration__username')) {
+                    console.log(check.status);
+                    const validation = new validationMessage(
+                        'Имя пользователя уже существует',
+                        'red',
+                        input,
+                        'copy'
+                    );
+                } else if (input.nextElementSibling.classList.contains('copy')) {
+                    input.nextElementSibling.remove();
+                } 
+            })
+            .catch(error => console.log(error));
+        }
+
+        // Удаляем смс о валидности, если все символы удалены из поля
+        if (inputValue == '' && input.nextElementSibling.classList.contains('copy')) {
+            input.nextElementSibling.remove();
+        }
+    });
+}
+
+// Проверка на занятость имени пользователя и email + исключение Кирилицы
 const usernameCheck = {};
-username.addEventListener("input", (e) => {
-    e.preventDefault();
-    const usernameValue = username.value;
+inputValidation(username, usernameCheck);
 
-    // Не включаем Кирилицу и только в этом случае отправляем запрос
-    if ((usernameValue.match(/[а-я]/) || usernameValue.match(/[А-Я]/)) || username.value.length < 5) {
-        const validation = new validationMessage(
-            'Логин должен содержать не меньше 5 латинских символов',
-            'red',
-            username,
-            'copy'
-        );
-    } else {
+const emailCheck = {};
+inputValidation(email, emailCheck);
 
-        // Асинхронно проверяем на сервере свободен ли логин
-        fetch('php/user_check.php', {
-            method: "POST",
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify(usernameValue)
-        })
-        .then(response => response.json())
-        .then(response => {
-            console.log(response);
-            usernameCheck.status = response;
-            if (response) {
-                console.log(usernameCheck.status);
-                const validation = new validationMessage(
-                    'Имя пользователя уже существует',
-                    'red',
-                    username,
-                    'copy'
-                );
-            } else if (username.nextElementSibling.classList.contains('copy')) {
-                username.nextElementSibling.remove();
-            } 
-        })
-        .catch(error => console.log(error));
-    }
-
-    // Удаляем смс о валидности, если все символы удалены из поля
-    if (usernameValue == '' && username.nextElementSibling.classList.contains('copy')) {
-        username.nextElementSibling.remove();
-    }
-});
 
 
 // Валидация пароля: числа, буквы и повторы
@@ -157,12 +199,16 @@ form.addEventListener("submit", (e)=>{
 
     /* 
     Жестко задаем отправку формы, только после выполнения условий: 
-    Логин: >= 5, англ символы И нет совпадений в базе данных
+    Email: Нет в базе и включает '@'
+    Имя пользователя: >= 5, англ символы И нет совпадений в базе данных
     Пароль: >= 8, англ символы и хотя бы 1 число 
     */
-    const passValue = pass.value, 
-    usernameValue = username.value;
-    if (!usernameCheck.status && usernameValue.length >= 5 && usernameValue.match(/[a-z]/) && 
+    const emailValue = email.value,
+    usernameValue = username.value,
+    passValue = pass.value;
+
+    if (!emailCheck.status && emailValue.match(/@/) && 
+    !usernameCheck.status && usernameValue.length >= 5 && usernameValue.match(/[a-z]/) && 
     passValue.length >= 8 && passValue.match(/[a-z]/) && passValue.match(/[0-9]/)) {
 
         const formData = new FormData(form);
@@ -204,29 +250,17 @@ form.addEventListener("submit", (e)=>{
     
                 const validation = new validationMessage(
                     'Что-то пошло не так.. Попробуйте, пожалуйста, позже',
-                    'green',
+                    'red',
                     form.querySelector('button'),
                     'copy'
                 );
             }
         })
-        .catch(error => {
-            console.log(error);
-            setTimeout(()=>{
-                pass.nextElementSibling.remove();
-            }, 2000);
-
-            const validation = new validationMessage(
-                'Что-то пошло не так.. Попробуйте, пожалуйста, позже',
-                'green',
-                form.querySelector('button'),
-                'copy'
-            );
-        });
+        .catch(error => console.log(error));
         
     } else {
-        if (usernameCheck.status) {
-            const errorMessage = 'Не удалось отправить форму. Данное имя пользователя уже существует.';
+        if (emailCheck.status) {
+            const errorMessage = 'Не удалось отправить форму. Пользователь с таким email уже зарегистрирован';
 
             const validation = new validationMessage(
                 errorMessage,
