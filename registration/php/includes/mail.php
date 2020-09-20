@@ -121,7 +121,7 @@
                                             В дальнейшем мы будем отправлять на него важные письма, уведомления и новости.  
                                         </div>
 
-                                        <a style="text-decoration: none; color: white;" href="">
+<a style="text-decoration: none; color: white;"href=https://simple-chat.com/registration/activation.php?token=894d363116a822b82e22a69695600130288ee671a76ec3d3d46598c8ff9832f0>
                                             <!-- Кнопка с бортами -->
                                             <div class="btn" style="margin-top: 24px; background-color: #00c084; text-align: center;
                                             font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 20px;
