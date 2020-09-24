@@ -16,11 +16,11 @@ class newUser {
     public function response ($output) {
         $this->output = $output;
 
-        if ($this->output) {
+        if ($this->output === true) {
             exit(json_encode(true)); // Возравщаем тру
 
-        } else if ($this->output == 'Не удалось добавить в базу') {
-            exit(json_encode('Не удалось добавить в базу'));
+        } else if ($this->output == 'Пользователь уже существует') {
+            exit(json_encode('Пользователь уже существует'));
 
         } else {
             exit(json_encode(false));
@@ -33,7 +33,13 @@ class newUser {
         $this->email = $email;
 
         include "connection_db.php";
-        $_GET = mysqli_fetch_assoc(mysqli_query($connection, "SELECT * FROM users WHERE email ='$this->email'"));
+        $count = mysqli_query($connection, "SELECT `id` FROM users WHERE email ='$this->email'");
+
+        if (mysqli_num_rows($count) == 1) {
+            $GLOBALS['email_check'] = true;
+        } else {
+            $GLOBALS['email_check'] = false;
+        }
         mysqli_close($connection);
     }
 
@@ -43,7 +49,13 @@ class newUser {
         $this->username = $username;
 
         include "connection_db.php";
-        $_GET = mysqli_fetch_assoc(mysqli_query($connection, "SELECT * FROM users WHERE username ='$this->username'"));
+        $count = mysqli_query($connection, "SELECT `id` FROM users WHERE username ='$this->username'");
+
+        if (mysqli_num_rows($count) == 1) {
+            $GLOBALS['user_check'] = true;
+        } else {
+            $GLOBALS['user_check'] = false;
+        }
         mysqli_close($connection);
     }
 
@@ -99,13 +111,13 @@ class newUser {
         $file = file($location);
 
         // Ссылка рассчитана на то, что в .htaccess убрано окончание php. Обычно: activation.php 
-        $link = "https://simple-e-chat.ru.com/registration/activation?token=$token"; 
+        $link = "https://simple-e-chat.ru.com/activation?token=$token"; 
 
         if (!empty($token) && isset($token)) {
 
             $str = '<a style="text-decoration: none; color: white;"href='.$link.'>';
 
-            // Меняем 121 строку на обновленную, со специальной ссылкой активации. 
+            // Меняем 124 строку на обновленную, со специальной ссылкой активации. 
             $file[123] = $str.PHP_EOL;
             file_put_contents($location, $file);
 
@@ -140,7 +152,7 @@ class newUser {
         $send = mail($to, $subject, $message, $headers);
 
         // Проверяем успех отправки и записываем ответ для отправки клиенту
-        if ($send) {
+        if ($send === true) {
             $GLOBALS['email_send'] = true;
         } else {
             $GLOBALS['email_send'] = false;
@@ -165,14 +177,32 @@ class newUser {
 
 
                 // Выводим сверстанную страницу с смс об успешной активации
-                $location = "./php/includes/mail.php";
+
+                // 1) Открываем файл в виде массива так, что каждая строка файла - индекс массива.
+                $location = "./php/includes/active.php";  
+                $file = file($location);
+
+                $str = 'Поздравляем, ваш аккаунт успешно активирован! <br>';
+
+                // 2) Меняем 25 строку на обновленную, с первым оповещением 
+                $file[56] = $str.PHP_EOL;
+                file_put_contents($location, $file);
+
+                // 3) Получаем обновленный файл ввиде строки и выводим 
                 $message = file_get_contents($location);
                 echo $message;
 
             } else {
                 // Если пользователь уже был верифицирован - не заходим в базу и оповещаем его
                 mysqli_close($connection);
-                echo 'Ваш аккаунт уже был активирован ранее';
+                
+                $location = "./php/includes/active.php";
+                $file = file($location);
+                $str = 'Ваш аккаунт уже был активирован ранее. <br>';
+                $file[56] = $str.PHP_EOL;
+                file_put_contents($location, $file);
+                $message = file_get_contents($location);
+                echo $message;
             }
         }
     }

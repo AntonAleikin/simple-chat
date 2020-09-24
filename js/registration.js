@@ -147,11 +147,33 @@ pass.addEventListener("input", ()=>{
         );
     }
 
-    // <= 8 И больше 2 повторов || ((>= 8 < 12) || >= 12), все есть, но больше 2 повторов. НЕ включаем Кирилицу
-    if (((Math.max(...arr) > 2 || passValue.match(/[a-z]/) || passValue.match(/[0-9]/) || 
-    passValue.match(/[A-Z]/)) && passValue.length <= 8 && !passValue.match(/[а-я]/) && !passValue.match(/[А-Я]/)) || 
-    (Math.max(...arr) > 2 && passValue.match(/[a-z]/) && passValue.match(/[A-Z]/) && passValue.match(/[0-9]/) && 
-    ((passValue.length >= 8 && passValue.length < 12) || passValue.length >= 12))) {  
+    // Пароль должен содержать не меньше 8 латинских символов и хотя бы одну цифру
+    if ((passValue.match(/[a-z]/) || passValue.match(/[A-Z]/) || passValue.match(/[0-9]/)) && 
+    passValue.length < 8 && !passValue.match(/[а-я]/) && !passValue.match(/[А-Я]/)) {
+
+        const validation = new validationMessage(
+            'Пароль должен содержать не меньше 8 латинских символов и хотя бы одну цифру',
+            'red',
+            pass,
+            'copy'
+        );
+    }
+
+    if ((passValue.match(/[a-z]/) || passValue.match(/[0-9]/)) && 
+    passValue.length >= 8 && !passValue.match(/[а-я]/) && !passValue.match(/[А-Я]/)) {
+
+        const validation = new validationMessage(
+            'У вас ненадежный пароль!',
+            'red',
+            pass,
+            'copy'
+        );
+    }
+
+    // Ухудшение надежного пароля ((>= 8 < 12) || >= 12), все есть, но больше 2 повторов
+    if (Math.max(...arr) > 2 && passValue.match(/[a-z]/) && passValue.match(/[A-Z]/) && passValue.match(/[0-9]/) && 
+    !passValue.match(/[а-я]/) && !passValue.match(/[А-Я]/) &&
+    ((passValue.length >= 8 && passValue.length < 12) || passValue.length >= 12)) {  
 
         const validation = new validationMessage(
             'У вас ненадежный пароль!',
@@ -160,11 +182,13 @@ pass.addEventListener("input", ()=>{
             'copy'
         );
     } 
+
     // >= 8 < 12, НЕ больше 2 повторов любых символов, все есть || >= 12, макс 3 повтора, все есть 
-    if (((Math.max(...arr) == 1 || Math.max(...arr) == 2) && passValue.match(/[a-z]/) && 
+    if ((((Math.max(...arr) == 1 || Math.max(...arr) == 2) && passValue.match(/[a-z]/) && 
     passValue.match(/[0-9]/) && passValue.match(/[A-Z]/) && passValue.length >= 8 && passValue.length < 12) || 
     (Math.max(...arr) == 3 && passValue.match(/[a-z]/) && 
-    passValue.match(/[A-Z]/) && passValue.match(/[0-9]/) && passValue.length >= 12)) {
+    passValue.match(/[A-Z]/) && passValue.match(/[0-9]/) && passValue.length >= 12))  && 
+    !passValue.match(/[а-я]/) && !passValue.match(/[А-Я]/)) {
 
         const validation = new validationMessage(
             'Пароль средней надежности',
@@ -173,9 +197,11 @@ pass.addEventListener("input", ()=>{
             'copy'
         ); 
     }
+
     // >= 12, НЕ больше 2 повторов любых символов, все есть
     if ((Math.max(...arr) == 1 || Math.max(...arr) == 2) && passValue.match(/[a-z]/) && 
-    passValue.match(/[A-Z]/) && passValue.match(/[0-9]/) && passValue.length >= 12) {
+    passValue.match(/[A-Z]/) && passValue.match(/[0-9]/) && passValue.length >= 12 && 
+    !passValue.match(/[а-я]/) && !passValue.match(/[А-Я]/)) {
  
         const validation = new validationMessage(
             'У вас надежный пароль!',
@@ -228,7 +254,8 @@ form.addEventListener("submit", (e)=>{
         })
         .then(res => res.json())
         .then(res => {
-            if (res) {
+
+            if (res === true) {
                 console.log(res);
                 // Очищаем форму и смс о валидности пароля спустя 2 сек
                 setTimeout(()=>{
@@ -242,6 +269,16 @@ form.addEventListener("submit", (e)=>{
                     form.querySelector('button'),
                     'copy'
                 );
+
+            } if (res == 'Пользователь уже существует') {
+
+                const validation = new validationMessage(
+                    'Не удалось отправить форму. Пользователь с таким email уже зарегистрирован!',
+                    'red',
+                    form.querySelector('button'),
+                    'copy'
+                );
+
             } else {
                 console.log(res);
                 setTimeout(()=>{
@@ -258,17 +295,19 @@ form.addEventListener("submit", (e)=>{
         })
         .catch(error => console.log(error));
         
-    } else {
-        if (emailCheck.status) {
-            const errorMessage = 'Не удалось отправить форму. Пользователь с таким email уже зарегистрирован';
 
-            const validation = new validationMessage(
-                errorMessage,
-                'red',
-                form.querySelector('button'),
-                'copy'
-            );
-        }
+     // Если форма не отправилась и email существует - оповещаем
+    } else if (emailCheck.status) {
+            
+        const validation = new validationMessage(
+            'Не удалось отправить форму. Пользователь с таким email уже зарегистрирован',
+            'red',
+            form.querySelector('button'),
+            'copy'
+        );
+
+    } else {
+
         const errorMessage = 'Не удалось отправить форму. Пожалуйста, проверьте правильность написания'+ 
         ' логина и пароля. Пароль должен состоять только из латинских символов и хотя бы одной цифры.'+ 
         ' Длина пароля должна быть не менее 8 символов.';
@@ -280,4 +319,5 @@ form.addEventListener("submit", (e)=>{
             'copy'
         );
     }
+    
 });

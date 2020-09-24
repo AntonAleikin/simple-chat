@@ -1,0 +1,74 @@
+header 
+    position: relative
+
+.header_nav
+    height: 60px
+    background-color: $main
+    border-radius: 30px
+
+    .hamburger
+        display: none
+
+    .menu
+        height: 100%
+        padding: 17px 50px
+        margin: 0
+        list-style-type: none
+
+        display: flex 
+        justify-content: space-between
+
+        // Разделяем главную влево, а все остальное - вправо
+        &_section_left
+            display: flex
+            justify-content: start
+            align-items: center
+
+        &_section_right
+            display: flex
+            justify-content: end
+            align-items: center
+
+        // Указываем точный путь, так как menu_link лежит внутри секций 
+        .menu_link
+            position: relative
+            color: $white_color
+            // Задаем отступы бортами, чтобы потом сделать active и кнопка никуда не сдвигалась
+            border-left: 21px solid $main
+            border-right: 21px solid $main
+
+            &:hover
+                text-decoration: none
+                color: $white_color
+               
+        
+        .border
+            &::before
+                content: ""
+                display: block
+                width: 1px
+                height: 31px
+                background-color: $white_color
+                // Расположение:
+                position: absolute
+                left: -22px
+                // Выравниваем по-центру:
+                top: 50%
+                transform: translateY(-50%)
+                //transform: translateX(-100%)
+               
+
+        .active
+            color: $text
+            background-color: $white_color
+            border: 21px solid $white_color
+            border-radius: 10px
+
+            &:hover
+                text-decoration: none
+                color: $text
+
+            // Отключаем разделитель, если он есть у кнопки
+            &::before 
+                content: ""
+                display: none
