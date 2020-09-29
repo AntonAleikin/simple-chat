@@ -1,9 +1,10 @@
 "use strict";
 
-const form = document.querySelector(".registration__form"),
-pass = form.querySelector('.registration__pass'),
-username = form.querySelector('.registration__username'),
-email = form.querySelector('.registration__email');
+const form = document.querySelector(".registration-form"),
+pass = form.querySelector('.registration-form__input-pass'),
+pass2 = form.querySelector('.registration-form__input-pass-confirmation'),
+username = form.querySelector('.registration-form__input-username'),
+email = form.querySelector('.registration-form__input-email');
 
 
 // Класс вывода оповещений о валидности данных, заполняемых в форме 
@@ -20,7 +21,7 @@ class validationMessage {
         this.neighbour.after(message);
         message.classList.add(this.copy);
         message.classList.add(this.style);
-        message.innerText = this.message;
+        message.innerHTML = this.message;
         this.neighbour.value.trim(); // Удаляем пробелы 
 
         // Удаляем копии, из-за события инпут
@@ -37,7 +38,7 @@ function inputValidation (input, check) {
         e.preventDefault();
 
         // Записываем email и username пути к php файлам для чека
-        if (input.classList.contains('registration__email')) {
+        if (input.classList.contains('registration-form__input-email')) {
             check.path = 'php/email_check.php';
         } else {
             check.path = 'php/user_check.php';
@@ -47,8 +48,8 @@ function inputValidation (input, check) {
         
         // Не включаем Кирилицу + валидація и только в этом случае отправляем запрос  
         const inputValue = input.value;  
-        if ((input.classList.contains('registration__email') && !inputValue.match(/@/)) ||
-            (input.classList.contains('registration__email') && 
+        if ((input.classList.contains('registration-form__input-email') && !inputValue.match(/@/)) ||
+            (input.classList.contains('registration-form__input-email') && 
             (inputValue.match(/[а-я]/) || inputValue.match(/[А-Я]/) || inputValue.match(/[A-Z]/) || 
             inputValue.length < 6))) { 
 
@@ -58,7 +59,7 @@ function inputValidation (input, check) {
                 input,
                 'copy'
             );
-        } else if (input.classList.contains('registration__username') &&
+        } else if (input.classList.contains('registration-form__input-username') &&
             (inputValue.match(/[а-я]/) || inputValue.match(/[А-Я]/) || inputValue.length < 5)) {
 
             const validation = new validationMessage(
@@ -83,7 +84,7 @@ function inputValidation (input, check) {
                 check.status = response;
                 
                 // Выводим оповещения, если email И username существуют
-                if (response && input.classList.contains('registration__email')) {
+                if (response && input.classList.contains('registration-form__input-email')) {
                     console.log(check.status);
                     const validation = new validationMessage(
                         'Пользователь с таким email уже существует',
@@ -91,7 +92,7 @@ function inputValidation (input, check) {
                         input,
                         'copy'
                     );
-                } else if (response && input.classList.contains('registration__username')) {
+                } else if (response && input.classList.contains('registration-form__input-username')) {
                     console.log(check.status);
                     const validation = new validationMessage(
                         'Имя пользователя уже существует',
@@ -218,6 +219,40 @@ pass.addEventListener("input", ()=>{
 });
 
 
+// Проверка подтверждения пароля
+pass2.addEventListener("input", (e) => {
+
+    if (pass.value != '' && pass2.value != '' && pass.value == pass2.value) {
+        const validation = new validationMessage(
+            '<img src="icons/checked_blue.png" alt="approved">',
+            'green', // Просто добавить класс, который застилизован стоять сбоку
+            pass2,
+            'copy'
+        ); 
+    } else {
+        const validation = new validationMessage(
+            'Нет совпадений',
+            'red',
+            pass2,
+            'copy'
+        ); 
+    }
+});
+
+
+
+// Настройка модального окна
+const modal = document.querySelector('.overlay'),
+closeModal = modal.querySelector('.modal__close');
+
+closeModal.addEventListener("click", (e) => {
+    // Закрываем модальное окно и разрешаем прокрутку
+    modal.style.display = 'none';
+    document.querySelector('body').style.overflow = 'scroll';
+});
+
+
+
 // Регистрация
 form.addEventListener("submit", (e)=>{
     // Убираем стандартное поведение браурера. Чтобы ст не обновлялась, после отправки
@@ -257,10 +292,17 @@ form.addEventListener("submit", (e)=>{
 
             if (res === true) {
                 console.log(res);
+
+                // Показываем модальное окно
+                modal.style.display = 'block';
+                document.querySelector('body').style.overflow = 'hidden'; // Блокируем прокрутку
+
+
                 // Очищаем форму и смс о валидности пароля спустя 2 сек
                 setTimeout(()=>{
                     form.reset();
                     pass.nextElementSibling.remove();
+                    pass2.nextElementSibling.remove();
                 }, 2000);
     
                 const validation = new validationMessage(
@@ -269,6 +311,7 @@ form.addEventListener("submit", (e)=>{
                     form.querySelector('button'),
                     'copy'
                 );
+                
 
             } if (res == 'Пользователь уже существует') {
 
@@ -288,7 +331,7 @@ form.addEventListener("submit", (e)=>{
                 const validation = new validationMessage(
                     'Что-то пошло не так.. Попробуйте, пожалуйста, позже',
                     'red',
-                    form.querySelector('button'),
+                    form.querySelector('.registration-form__button'),
                     'copy'
                 );
             }
@@ -302,7 +345,7 @@ form.addEventListener("submit", (e)=>{
         const validation = new validationMessage(
             'Не удалось отправить форму. Пользователь с таким email уже зарегистрирован',
             'red',
-            form.querySelector('button'),
+            form.querySelector('.registration-form__button'),
             'copy'
         );
 
@@ -315,7 +358,7 @@ form.addEventListener("submit", (e)=>{
         const validation = new validationMessage(
             errorMessage,
             'red',
-            form.querySelector('button'),
+            form.querySelector('.registration-form__button'),
             'copy'
         );
     }

@@ -1,13 +1,31 @@
-header 
+.header 
+    height: 60px
     position: relative
-
-.header_nav
+    
+    
+.header-nav
     height: 60px
     background-color: $main
     border-radius: 30px
 
+    // Гамбургер
     .hamburger
+        width: 30px
+        height: 15px
+        
+        position: absolute
+        top: 50%
+        left: 30px
+        transform: translateY(-50%)
+        cursor: pointer
         display: none
+
+        span
+            display: block
+            width: 100%
+            height: 1px
+            background-color: $white_color
+            transition: all 0.3s ease-out // Для плавности следующих переходов
 
     .menu
         height: 100%
@@ -19,18 +37,18 @@ header
         justify-content: space-between
 
         // Разделяем главную влево, а все остальное - вправо
-        &_section_left
+        &__section-left
             display: flex
             justify-content: start
             align-items: center
 
-        &_section_right
+        &___section-right
             display: flex
             justify-content: end
             align-items: center
 
         // Указываем точный путь, так как menu_link лежит внутри секций 
-        .menu_link
+        .menu__link
             position: relative
             color: $white_color
             // Задаем отступы бортами, чтобы потом сделать active и кнопка никуда не сдвигалась
@@ -62,7 +80,9 @@ header
             color: $text
             background-color: $white_color
             border: 21px solid $white_color
-            border-radius: 10px
+            border-top: 16px solid $white_color
+            border-top-left-radius: 10px
+            border-top-right-radius: 10px 
 
             &:hover
                 text-decoration: none

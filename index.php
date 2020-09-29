@@ -14,9 +14,10 @@
 <body>
     <!-- Header -->
     <div class="container">
-        <Header>
+        
+        <header class="header">
             <?php include './php/includes/nav.php'?>
-        </Header>
+        </header>
     </div>
      
 </body>
