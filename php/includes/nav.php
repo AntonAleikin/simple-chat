@@ -16,22 +16,44 @@
             </li>
 
             <li class="menu__item">
-                <a href="/chat.php" class="menu__link menu__link-chat border">Чат</a>
+                <a href="/chat" class="menu__link menu__link-chat border">Чат</a>
             </li>
         </div>
+        
         
         <!-- Правая секция меню -->
         <div class="menu___section-right">
 
-            <li class="menu__item">
-                <a href="/registration.php" class="menu__link menu__link-registration">
-                    Зарегистрироваться
-                </a>
-            </li>
+            <?php
+                if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email'])) { 
+            ?>
 
-            <li class="menu__item">
-                <a href="/login.php" class="menu__link menu__link-login border">Войти</a>
-            </li>
+                <!-- Личный кабинет (показываем после логина) -->
+                <li class="menu__item">
+                    <a href="/account" class="menu__link menu__link-account">
+                        Личный кабинет
+                    </a>
+                </li>
+                
+            <?php 
+                } else { 
+            ?> 
+
+                <!-- Шапка меню без логина и сессии -->
+                <li class="menu__item">
+                    <a href="/registration" class="menu__link menu__link-registration">
+                        Зарегистрироваться
+                    </a>
+                </li>
+
+                <li class="menu__item">
+                    <a href="/login" class="menu__link menu__link-login border">Войти</a>
+                </li> 
+
+            <?php 
+                } 
+            ?> 
+
         </div>
     </ul>
 </nav>

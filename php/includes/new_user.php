@@ -12,7 +12,7 @@ class newUser {
         $_POST = json_decode(file_get_contents("php://input"), true);
     }
 
-    // Отвечаем о наличии пользователя в базе
+    // Отправляем ответ клиенту
     public function response ($output) {
         $this->output = $output;
 
@@ -103,7 +103,7 @@ class newUser {
     }
 
 
-    // Записываем хеш email (token) в ссылку кнопки активации в письме
+    // Записываем token в ссылку кнопки активации в email письме
     public function editMail ($token, $blanc) {
         $location = "./includes/mail.php";
 
@@ -117,8 +117,8 @@ class newUser {
 
             $str = '<a style="text-decoration: none; color: white;"href='.$link.'>';
 
-            // Меняем 124 строку на обновленную, со специальной ссылкой активации. 
-            $file[123] = $str.PHP_EOL;
+            // Меняем 123 строку на обновленную, со специальной ссылкой активации. 
+            $file[122] = $str.PHP_EOL;
             file_put_contents($location, $file);
 
             // Очищаем глобальную переменную с токеном, после добавления его в письмо. 
@@ -127,7 +127,7 @@ class newUser {
         } else {
             // Убираем ссылку активации, ставим пустую строку в письмо
             $str = "<a style='text-decoration: none; color: white;' href='$blanc'>";
-            $file[120] = $str.PHP_EOL;
+            $file[122] = $str.PHP_EOL;
             file_put_contents($location, $file);
         }
     }
@@ -176,6 +176,11 @@ class newUser {
                 mysqli_close($connection);
 
 
+                // Начинаем сессию и записываем туда что активация успешна 
+                session_start();
+                $_SESSION['verified'] = true;
+
+
                 // Выводим сверстанную страницу с смс об успешной активации
 
                 // 1) Открываем файл в виде массива так, что каждая строка файла - индекс массива.
@@ -184,8 +189,8 @@ class newUser {
 
                 $str = 'Поздравляем, ваш аккаунт успешно активирован! <br>';
 
-                // 2) Меняем 25 строку на обновленную, с первым оповещением 
-                $file[56] = $str.PHP_EOL;
+                // 2) Меняем 61 строку на обновленную, с первым оповещением 
+                $file[60] = $str.PHP_EOL;
                 file_put_contents($location, $file);
 
                 // 3) Получаем обновленный файл ввиде строки и выводим 
@@ -199,7 +204,7 @@ class newUser {
                 $location = "./php/includes/active.php";
                 $file = file($location);
                 $str = 'Ваш аккаунт уже был активирован ранее. <br>';
-                $file[56] = $str.PHP_EOL;
+                $file[60] = $str.PHP_EOL;
                 file_put_contents($location, $file);
                 $message = file_get_contents($location);
                 echo $message;

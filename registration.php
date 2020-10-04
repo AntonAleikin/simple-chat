@@ -1,3 +1,12 @@
+<?php
+    session_start();
+
+    if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email'])) {
+
+        // Если во время сессии перейти по ссылке на эту ст - попадем на главную
+        header("Location: /");
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

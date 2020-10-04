@@ -118,10 +118,9 @@
                                         font-family: 'Roboto', sans-serif; color: #ad66a9; font-size: 18px;">
                                             Теперь у вас есть аккаунт в нашем онлайн-мессенджере.
                                             Чтобы активировать его и начать пользоватся чатом, подтвердите ваш email.
-<a style='text-decoration: none; color: white;' href=''>
                                         </div>
 
-<a style="text-decoration: none; color: white;"href=https://simple-e-chat.ru.com/activation?token=4a64fc6dbd2f4daf01ec6da903a0bbcef4fca93ef729e9727c409c6d2a5ab558>
+<a style="text-decoration: none; color: white;"href=https://simple-e-chat.ru.com/activation?token=37d437d40fb1a253f2957dc76e9e0ababbb36905da6a50307a83abc55577ed22>
                                             <!-- Кнопка с бортами -->
                                             <div class="btn" style="margin-top: 24px; background-color: #00c084; text-align: center;
                                             font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 20px;

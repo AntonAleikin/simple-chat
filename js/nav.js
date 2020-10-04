@@ -1,12 +1,13 @@
 "use strict";
 
+// Добавляем класс активности каждой открытой вкладке меню
 function active(path, id) {
     const links = document.querySelectorAll('.menu__link');
 
     links.forEach((link) => {
     
         if (window.matchMedia('(min-width: 768px)').matches) {
-    
+
             const pathname = document.location.pathname;
             if (pathname === path && link.classList.contains(id)) {
                 link.classList.toggle('active');
@@ -17,9 +18,10 @@ function active(path, id) {
     });
 }
 active('/', 'menu__link-home');
-active('/chat.php', 'menu__link-chat');
-active('/registration.php', 'menu__link-registration');
-active('/login.php', 'menu__link-login');
+active('/chat', 'menu__link-chat');
+active('/registration', 'menu__link-registration');
+active('/login', 'menu__link-login');
+active('/account', 'menu__link-account');
 
 
 // Гамбургер
