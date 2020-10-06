@@ -1,0 +1,134 @@
+.chat
+    width: 80%
+    height: 400px
+    margin: 0 auto
+    margin-top: 30px
+    background-color: $main_bg
+    border-radius: 20px
+
+    display: flex
+
+.left-bar 
+    padding-top: 10px
+    width: 25%
+    height: 100%
+    background-color: $main_bg
+    border-radius: 20px
+
+.user-search
+    position: relative
+    margin-bottom: 20px
+
+    &__input
+        display: block
+        margin: 0 auto
+        padding: 0 10px
+        width: 97%
+        height: 50px
+        font-size: 14px
+        border: none
+        border-radius: 20px
+
+    &__button
+        position: absolute
+        top: 25%
+        right: 15px
+        background-color: $white_color
+        border: none 
+
+        i
+            color: $text
+
+    
+.searched-user
+    display: flex
+    cursor: pointer
+
+    padding: 10px
+    width: 100%
+    height: 40px
+    background-color: #fff
+    &__username
+        padding: 0 10px
+    i
+        color: $text
+
+
+// Правая сторона
+.right-bar
+    padding: 20px 
+    width: 90%
+    height: 100%
+
+    display: flex
+    flex-direction: column
+    justify-content: flex-end
+
+
+.send-message
+    display: flex
+    align-items: center
+    &__input
+        padding: 10px
+        width: 70%
+        height: 85px
+        border: none
+        border-radius: 10px
+        resize: none
+    &__button
+        margin-left: 20px
+        width: 60px
+        height: 60px
+        border: none
+        border-radius: 100%
+        i
+            color: $text
+
+ 
+.dialogue-frame
+    position: relative
+    margin-bottom: 20px
+    width: 85%
+    height: 100%
+    background-color: $white_color
+    border-radius: 10px
+    overflow-y: scroll
+    
+
+    // Держим Первые смс внизу диалогового окна
+    &-wrapper
+        padding-bottom: 10px
+        position: absolute
+        bottom: 0
+        width: 99%
+        &-scroll
+            position: relative
+
+        
+        
+        
+
+    &__message-wrapper-right // Отображаем наши смс справа
+        display: flex
+        justify-content: flex-end
+
+        margin: 7.5px 20px 7.5px 0
+    &__message
+        display: flex
+        justify-content: space-between
+        align-items: center
+
+        padding: 10px 20px
+        width: 140px
+        height: 40px
+        background-color: $main_bg
+        border-radius: 20px
+    
+    &__message-time
+        font-size: 12px
+        color: grey
+
+    &__message-wrapper-left // Меняем цвет смс опонента и расположение
+        margin: 7.5px 0 7.5px 20px
+        .dialogue-frame__message
+            background-color: #d9d9d9 
