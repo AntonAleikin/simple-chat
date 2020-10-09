@@ -41,28 +41,51 @@
 
     
 .searched-user
+    position: relative
     display: flex
+    align-items: center
     cursor: pointer
 
     padding: 10px
     width: 100%
     height: 40px
     background-color: #fff
-    &__username
-        padding: 0 10px
+    border-bottom: 1px solid $text
     i
         color: $text
+    &__username
+        width: 70%
+        padding: 0 10px
+        color: $text
+    &__delete
+        position: absolute
+        right: 10px
+
+.no-matches
+    padding: 0 10px 10px 10px
+    text-align: center
+    color: grey
 
 
 // Правая сторона
-.right-bar
+.right-bar-empty
     padding: 20px 
     width: 90%
     height: 100%
-
     display: flex
+    justify-content: center
+    align-items: center
+    color: grey
+
+.right-bar
+    display: none
     flex-direction: column
     justify-content: flex-end
+
+    padding: 20px 
+    width: 90%
+    height: 100%
+        
 
 
 .send-message
@@ -105,8 +128,6 @@
             position: relative
 
         
-        
-        
 
     &__message-wrapper-right // Отображаем наши смс справа
         display: flex
@@ -131,4 +152,4 @@
     &__message-wrapper-left // Меняем цвет смс опонента и расположение
         margin: 7.5px 0 7.5px 20px
         .dialogue-frame__message
-            background-color: #d9d9d9 
+            background-color: $sms_answer

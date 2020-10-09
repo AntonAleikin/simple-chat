@@ -70,6 +70,10 @@ class autorisation {
             include "connection_db.php";
             $count = mysqli_query($connection, "SELECT `id` FROM users WHERE `email` = '$this->email' 
             AND `verified` = '1'");
+
+            // Получаем юзернейм
+            $username = mysqli_fetch_row(
+            mysqli_query($connection, "SELECT `username` FROM users WHERE `email` = '$this->email'"));
             mysqli_close($connection);
 
             // Начало сессии
@@ -81,9 +85,10 @@ class autorisation {
                 $_SESSION['verified'] = true;
             } 
 
-            //Записываем в сессию email и что логин успешен  
+            //Записываем в сессию email, юзернейм и что логин успешен  
             $_SESSION['login'] = true;
             $_SESSION['email'] = $this->email;
+            $_SESSION['username'] = $username[0];
             
             // Удаляем переменные сессии с помощью ф-ции unset: unset($_SESSION['login']);
         } 

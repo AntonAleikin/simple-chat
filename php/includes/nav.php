@@ -25,12 +25,14 @@
         <div class="menu___section-right">
 
             <?php
-                if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email'])) { 
+                if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email']) &&
+                !empty($_SESSION['username']) && isset($_SESSION['username'])) { 
             ?>
 
                 <!-- Личный кабинет (показываем после логина) -->
                 <li class="menu__item">
                     <a href="/account" class="menu__link menu__link-account">
+                        <i class="fas fa-user-circle"></i>
                         Личный кабинет
                     </a>
                 </li>

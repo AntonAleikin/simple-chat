@@ -1,7 +1,8 @@
 <?php
     session_start();
 
-    if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email'])) {
+    if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email']) && 
+    !empty($_SESSION['username']) && isset($_SESSION['username'])) {
 
         // Если во время сессии перейти по ссылке на эту ст - попадем на главную
         header("Location: /");
@@ -13,11 +14,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/bootstrap-reboot.min.css">
-    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
-    <link rel="stylesheet" href="css/main.min.css">
-    <script defer src="js/nav.js"></script>
+    <?php include './php/includes/main_head.php'?>
     <script defer src="js/login.js"></script>
 </head>
 

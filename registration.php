@@ -1,7 +1,8 @@
 <?php
     session_start();
 
-    if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email'])) {
+    if ($_SESSION['login'] === true && !empty($_SESSION['email']) && isset($_SESSION['email']) && 
+    !empty($_SESSION['username']) && isset($_SESSION['username'])) {
 
         // Если во время сессии перейти по ссылке на эту ст - попадем на главную
         header("Location: /");
@@ -14,10 +15,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Registration</title>
-    <link rel="stylesheet" href="css/bootstrap-reboot.min.css">
-    <link rel="stylesheet" href="css/bootstrap-grid.min.css">
-    <link rel="stylesheet" href="css/main.min.css">
-    <script defer src="js/nav.js"></script>
+    <?php include './php/includes/main_head.php'?>
     <script defer src="js/registration.js"></script>
 </head>
 
