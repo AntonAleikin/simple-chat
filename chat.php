@@ -1,5 +1,10 @@
 <?php
     session_start();
+
+    /* unset($_SESSION['login']);
+    unset($_SESSION['email']);
+    unset($_SESSION['username']);
+    unset($_SESSION['verified']); */
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,7 +41,7 @@
                     <!-- Окно поиска пользователей -->
                     <form class="user-search">
 
-                        <input placeholder="Найти пользователя" name="username" type="search" class="user-search__input">
+                        <input placeholder="Найти пользователя" name="companion" type="search" class="user-search__input">
 
                         <button class="user-search__button"><i class="fas fa-search"></i></button>
                     </form>
@@ -77,14 +82,14 @@
                             </div>
 
                             <!-- СМС опонента слева и другого цвета -->
-                            <div class="dialogue-frame__message-wrapper-left">
+                            <!-- <div class="dialogue-frame__message-wrapper-left">
 
                                 <div class="dialogue-frame__message">
 
                                     <div class="dialogue-frame__message-text">Привет!</div>
                                     <div class="dialogue-frame__message-time">11:51</div>
                                 </div>
-                            </div>
+                            </div> -->
 
                             
                         </div>
@@ -101,9 +106,6 @@
             </div>
 
         <?php
-                /* unset($_SESSION['login']);
-                unset($_SESSION['email']);
-                unset($_SESSION['username']); */
             }
         ?>        
   

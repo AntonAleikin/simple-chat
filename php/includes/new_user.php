@@ -87,8 +87,7 @@ class newUser {
 
 
             // Проверяем, добавился ли пользователь в базу и записываем ответ в глобальную переменную
-            $count = mysqli_query($connection, "SELECT `id` FROM `users` WHERE `email` = '$this->email'");
-            if (mysqli_num_rows($count) == 1) {
+            if ($registrate === true) {
                 $GLOBALS['registration_success'] = true;
             } else {
                 $GLOBALS['registration_success'] = false;

@@ -16,13 +16,13 @@
 function userInteractive() {
 
 
-    // Класс создания и отображения иконки найденного пользователя
+    // Класс создания и отображения иконки найденного пользователя (компаньона)
     class searchedUser {
-        constructor(neighbour, username) {
+        constructor(neighbour, companion) {
 
             this.neighbour = neighbour; // Строка поиска
-            this.username = username;
-            this.render();
+            this.companion = companion;
+            this.renderCompanion();
         }
 
 
@@ -47,7 +47,14 @@ function userInteractive() {
             rightBarEmpty.style.display = 'none';
             rightBar.style.display = 'flex';
 
+            // добавляем форме отправки смс id companion
+            rightBar.querySelector('.send-message').id = this.companion;
+
+            // включаем отправку смс
+            this.sendMessage();
             
+
+
             // Добавляем прокрутку смскам
             function smsScroll() {
 
@@ -63,22 +70,85 @@ function userInteractive() {
             }
             smsScroll();
             
+        } 
+
+
+        // Рендерим свои смс 
+        renderSms(companion, sms, time) {
+
+            // Добавляем всему диалоговому окну id компаньона
+            const dialogueFrame = document.querySelector('.dialogue-frame-wrapper');
+            dialogueFrame.id = companion;
+
+
+            // Задаем размеры рамки смс
+
+
+            const mySms = document.createElement('div');
+            mySms.classList.add('dialogue-frame__message-wrapper-right');
+            mySms.innerHTML = `
+
+                <div class="dialogue-frame__message">
+                                        
+                    <div class="dialogue-frame__message-text">${sms}</div>
+                    <div class="dialogue-frame__message-time">${time}</div>
+                </div>
+            `;
+            dialogueFrame.append(mySms);
         }
 
-        render() {
+
+        // Отправляем смс
+        sendMessage() {
+            const form = document.querySelector('.send-message');
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                const formData = new FormData(form),
+                object = {};
+                formData.forEach((value, key) => {
+                    object[key] = value;
+                });
+
+                // Дописываем id компаньона в объект, после того как были записаны данные формы
+                object.companion = form.id;
+
+                fetch('php/send_sms.php', {
+                    method: "POST",
+                    headers: {
+                        "Content-type": "application/json",
+                    },
+                    body: JSON.stringify(object)
+                })
+                .then(res => res.json())
+                .then(res => {
+
+                    // Запускаем ф-цию рендеринга смс
+                    this.renderSms(object.companion, object.sms, res);
+                    form.reset();
+
+                    console.log(res);
+                    console.log(object.sms, object.companion);  
+                });
+            });
+        }
+
+
+        renderCompanion() {
 
             //Если где-то ранее уже был отображен пользователь - удлаляем иконку и заново отображаем
-            if (document.getElementById(`${this.username}`)) {
-                document.getElementById(`${this.username}`).remove();
+            if (document.getElementById(`${this.companion}`)) {
+                document.getElementById(`${this.companion}`).remove();
             }
 
             const userIcon = document.createElement('div');
-            userIcon.id = this.username;
+            userIcon.id = this.companion;
             userIcon.classList.add('searched-user');
             userIcon.innerHTML = `
 
                 <i class="fas fa-user"></i>
-                <div class="searched-user__username">${this.username}</div>
+                <div class="searched-user__username">${this.companion}</div>
                 <i class="fas fa-trash searched-user__delete"></i>
             `;
             this.neighbour.after(userIcon);
@@ -141,7 +211,7 @@ function userInteractive() {
                     // Выводим найденого пользователя
                     const render = new searchedUser(
                         form,
-                        object.username
+                        object.companion
                     );
     
                 } else {
@@ -154,7 +224,7 @@ function userInteractive() {
                     // Оповещаем: Нет совпадений
                     const noMatches = document.createElement('div');
                     noMatches.classList.add('no-matches');
-                    noMatches.innerHTML = `Нет совпадений ${object.username}`;
+                    noMatches.innerHTML = `Нет совпадений ${object.companion}`;
                     form.after(noMatches);
                 }
             });

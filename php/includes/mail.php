@@ -120,7 +120,7 @@
                                             Чтобы активировать его и начать пользоватся чатом, подтвердите ваш email.
                                         </div>
 
-<a style="text-decoration: none; color: white;"href=https://simple-e-chat.ru.com/activation?token=37d437d40fb1a253f2957dc76e9e0ababbb36905da6a50307a83abc55577ed22>
+<a style='text-decoration: none; color: white;' href=''>
                                             <!-- Кнопка с бортами -->
                                             <div class="btn" style="margin-top: 24px; background-color: #00c084; text-align: center;
                                             font-family: 'Roboto', sans-serif; font-weight: bold; font-size: 20px;
