@@ -18,48 +18,86 @@ function userInteractive() {
 
     // Класс создания и отображения иконки найденного пользователя (компаньона)
     class searchedUser {
-        constructor(neighbour, companion) {
+        constructor(neighbour, companion, dialogueId) {
 
             this.neighbour = neighbour; // Строка поиска
             this.companion = companion;
-            this.renderCompanion();
+            this.dialogueId = dialogueId;
+        }
+
+
+
+        // Анимация иконок при открытии чата
+        userIconAnimation (eventTarget) {
+
+            const userIcons = document.querySelectorAll('.searched-user');
+            userIcons.forEach((icon) => {
+
+                icon.classList.remove('searched-user-active');
+            });
+
+            eventTarget.classList.add('searched-user-active');
         }
 
 
         // Активация чата При клике на пользователя
-        activateChat() {
+        activateChat(eventTarget, delitionBin) {
+
+            // Вызываем анимацию иконок пользователей при открытии чата для десктопной версии
+            if (window.matchMedia('(min-width: 768px)').matches) {
+
+                this.userIconAnimation(eventTarget);
+            }
+
+
+            // Загружаем последнии 20 смс из истории переписки
+            this.loadSms();
+            
+
             const rightBar = document.querySelector('.right-bar'),
-            rightBarEmpty = document.querySelector('.right-bar-empty'),
-            delitionBin = document.querySelector('.searched-user__delete');
-
-            // Добавляем обработчик ведру и удаление только что созданной иконки и диалог
-            delitionBin.addEventListener("click", (e) => {
-
-                // Очищаем диалоговое окно
-                rightBar.style.display = 'none';
-                rightBarEmpty.style.display = 'flex';
-
-                e.target.parentElement.remove();
-            });
+            rightBarEmpty = document.querySelector('.right-bar-empty');
 
 
-            // Отображаем диалоговое окно 
+            // Убираем блок с надписью Пока нет сообщений... И Включаем блок для загрузки диалогового окна
             rightBarEmpty.style.display = 'none';
             rightBar.style.display = 'flex';
 
-            // добавляем форме отправки смс id companion
-            rightBar.querySelector('.send-message').id = this.companion;
+            // Очищаем предыдущее диалоговое окно и затем отображаем новое
+            rightBar.innerHTML = '';
+
+            // Создаем новое диалоговое окно 
+            const dialogueFrame = document.createElement('div');
+            dialogueFrame.id = this.companion;
+            dialogueFrame.dataset.companion = this.companion;
+            dialogueFrame.classList.add('dialogue-frame');
+            dialogueFrame.innerHTML = `
+
+                <div id="${this.companion}" data-companion="${this.companion}" class="dialogue-frame-wrapper"></div>
+            `;
+            rightBar.append(dialogueFrame);
+
+
+            // Создаем форму отправки смс
+            const sendSmsForm = document.createElement('form');
+            sendSmsForm.id = this.companion;
+            sendSmsForm.dataset.companion = this.companion;
+            sendSmsForm.classList.add('send-message');
+            sendSmsForm.innerHTML = `
+            
+                <textarea required placeholder="Введите ваше сообщение" name="sms" type="text" 
+                class="send-message__input"></textarea>
+
+                <button class="send-message__button"><i class="fas fa-paper-plane"></i></button>
+            `;
+            rightBar.append(sendSmsForm);
+
 
             // включаем отправку смс
-            this.sendMessage();
+            this.sendMessage(sendSmsForm, dialogueFrame);
             
 
-
             // Добавляем прокрутку смскам
-            function smsScroll() {
-
-                const dialogueFrame = document.querySelector('.dialogue-frame'),
-                dialogueFrameWrapper = dialogueFrame.querySelector('.dialogue-frame-wrapper');
+            function smsScroll(dialogueFrame, dialogueFrameWrapper) {
             
                 if (dialogueFrameWrapper.clientHeight >= dialogueFrame.clientHeight) {
             
@@ -68,51 +106,68 @@ function userInteractive() {
                     dialogueFrame.scrollTop = dialogueFrame.scrollHeight - dialogueFrame.clientHeight;        
                 }
             }
-            smsScroll();
-            
+            smsScroll(dialogueFrame ,dialogueFrame.firstElementChild);
+
+
+
+            // Удаляем диалоговое окно вместе с иконкой пользователя
+            delitionBin.addEventListener("click", (e) => {
+
+
+                // Удаляем диалоговое окно и форму этого пользователя
+                dialogueFrame.remove();
+                sendSmsForm.remove();
+
+
+                // Показываем блок с надписью Нет сообщений...
+                rightBarEmpty.style.display = 'flex';
+                rightBar.style.display = 'none';
+
+
+                delitionBin.parentElement.remove();
+            });
         } 
 
 
-        // Рендерим свои смс 
-        renderSms(companion, sms, time) {
 
-            // Добавляем всему диалоговому окну id компаньона
-            const dialogueFrame = document.querySelector('.dialogue-frame-wrapper');
-            dialogueFrame.id = companion;
+        // Загружаем историю переписки
+        loadSms() {
 
+            /* const companionData = {
+                'companion': this.companion,
+                'dialogueId': this.dialogueId
+            }; */
 
-            // Задаем размеры рамки смс
+            fetch('php/load_sms.php', {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify(this.dialogueId)
+            })
+            .then(loadedSms => loadedSms.json())
+            .then(loadedSms => {
 
-
-            const mySms = document.createElement('div');
-            mySms.classList.add('dialogue-frame__message-wrapper-right');
-            mySms.innerHTML = `
-
-                <div class="dialogue-frame__message">
-                                        
-                    <div class="dialogue-frame__message-text">${sms}</div>
-                    <div class="dialogue-frame__message-time">${time}</div>
-                </div>
-            `;
-            dialogueFrame.append(mySms);
+                console.log(loadedSms);
+            });
         }
 
 
-        // Отправляем смс
-        sendMessage() {
-            const form = document.querySelector('.send-message');
 
-            form.addEventListener("submit", (e) => {
+        // Отправляем смс
+        sendMessage(sendSmsForm, dialogueFrame) {
+
+            sendSmsForm.addEventListener("submit", (e) => {
                 e.preventDefault();
 
-                const formData = new FormData(form),
+                const formData = new FormData(sendSmsForm),
                 object = {};
                 formData.forEach((value, key) => {
                     object[key] = value;
                 });
 
-                // Дописываем id компаньона в объект, после того как были записаны данные формы
-                object.companion = form.id;
+                // Дописываем компаньона в объект, после того как были записаны данные формы
+                object.companion = sendSmsForm.dataset.companion;
 
                 fetch('php/send_sms.php', {
                     method: "POST",
@@ -121,29 +176,59 @@ function userInteractive() {
                     },
                     body: JSON.stringify(object)
                 })
-                .then(res => res.json())
-                .then(res => {
+                .then(smsData => smsData.json())
+                .then(smsData => {
+
+                    // Записываем id только что созданного диалога, если это первая смс
+                    if (this.dialogueId == '' || this.dialogueId == undefined) {
+
+                        this.dialogueId = smsData.dialogueId;
+                    }
 
                     // Запускаем ф-цию рендеринга смс
-                    this.renderSms(object.companion, object.sms, res);
-                    form.reset();
+                    this.renderSms(dialogueFrame.firstElementChild ,smsData.text, smsData.time);
+                    sendSmsForm.reset();
 
-                    console.log(res);
-                    console.log(object.sms, object.companion);  
+                    console.log(smsData); 
                 });
             });
         }
 
 
-        renderCompanion() {
+        // Рендерим свои смс внутри dialogue-frame-wrapper 
+        renderSms(dialogueFrameWrapper ,sms, time) {
 
+            //if ()
+
+
+            const mySms = document.createElement('div');
+            mySms.classList.add('dialogue-frame__message-wrapper-right');
+            mySms.innerHTML = `
+
+                <div class="dialogue-frame__message" data-dialogueId = "${this.dialogueId}">
+                                        
+                    <div class="dialogue-frame__message-text">${sms}</div>
+                    <div class="dialogue-frame__message-time">${time}</div>
+                </div>
+            `;
+            dialogueFrameWrapper.append(mySms);
+        }
+
+
+        // Отображаем иконку пользователя
+        renderCompanion() {
+            
             //Если где-то ранее уже был отображен пользователь - удлаляем иконку и заново отображаем
-            if (document.getElementById(`${this.companion}`)) {
-                document.getElementById(`${this.companion}`).remove();
-            }
+            document.querySelectorAll('.searched-user').forEach((companion) => {
+                if(companion != null && companion.dataset.companion == this.companion) {
+
+                    companion.remove();
+                }
+            }); 
 
             const userIcon = document.createElement('div');
             userIcon.id = this.companion;
+            userIcon.dataset.companion = this.companion;
             userIcon.classList.add('searched-user');
             userIcon.innerHTML = `
 
@@ -152,29 +237,49 @@ function userInteractive() {
                 <i class="fas fa-trash searched-user__delete"></i>
             `;
             this.neighbour.after(userIcon);
+            
 
 
             // Добавляем обработчик ведру и удаление только что созданной иконки 
-            const delitionBin = document.querySelector('.searched-user__delete');
-            delitionBin.addEventListener("click", (e) => {
+            userIcon.querySelector('.searched-user__delete').addEventListener("click", (e) => {
 
                 e.target.parentElement.remove();
             });
 
-
+            
+            
             // Добавляем обработчик иконке для отрытия диалогового окна
-            const beginChat = document.querySelector('.searched-user__username');
-            beginChat.addEventListener("click", (e) => {
-                e.preventDefault();
+            userIcon.querySelector('.searched-user__username').addEventListener("click", (e) => {
 
-                // Вызываем ранее созданную ф-цию активации чата
-                this.activateChat(); 
+                this.activateChat(e.target.parentElement, userIcon.querySelector('.searched-user__delete'));
             });
         }
     }
 
 
-    // Отправляем запрос на сервер и проверяем пользователя
+    // Проверяем активные диалоги и сразу после загрузки страницы оторажаем иконки этих пользователей
+    function checkActiveChats() {
+
+        fetch('php/check_active_chats.php')
+        .then(activeDialogues => activeDialogues.json())
+        .then(activeDialogues => {
+            
+            activeDialogues.forEach((activeDialogue) => {
+                
+                // Выводим иконку пользователя, с которым есть активный чат
+                const render = new searchedUser(
+                    document.querySelector('.user-search'), // форма поиска
+                    activeDialogue.companion,
+                    activeDialogue.dialogueId
+                ).renderCompanion();
+            });
+        }); 
+    }
+    checkActiveChats();
+    
+
+
+    // Ищем пользователя
     function userSearch() {
 
         const form = document.querySelector('.user-search');
@@ -195,11 +300,11 @@ function userInteractive() {
                 },
                 body: JSON.stringify(object)
             })
-            .then(res => res.json())
-            .then(res => {
+            .then(searchedCompanion => searchedCompanion.json())
+            .then(searchedCompanion => {
                 
-                if (res === true) {
-    
+                if (searchedCompanion != false && searchedCompanion != '') {
+
                     form.reset();
     
                     // Удаляем оповещение "Нет совпадений", если оно есть
@@ -211,8 +316,9 @@ function userInteractive() {
                     // Выводим найденого пользователя
                     const render = new searchedUser(
                         form,
-                        object.companion
-                    );
+                        searchedCompanion.companion,
+                        searchedCompanion.dialogueId
+                    ).renderCompanion();
     
                 } else {
     
@@ -224,13 +330,13 @@ function userInteractive() {
                     // Оповещаем: Нет совпадений
                     const noMatches = document.createElement('div');
                     noMatches.classList.add('no-matches');
-                    noMatches.innerHTML = `Нет совпадений ${object.companion}`;
+                    noMatches.innerHTML = `Нет совпадений ${searchedCompanion.companion}`;
                     form.after(noMatches);
                 }
             });
     
         });
     }
-    userSearch(); 
+    userSearch();
 }
 userInteractive();

@@ -51,6 +51,12 @@
     height: 40px
     background-color: #fff
     border-bottom: 1px solid $text
+    transition: all 0.5s 
+    &-active
+        height: 50px
+        margin-bottom: 6px
+        transform: translateX(6px)
+        box-shadow: -5px 4px 5px darkslategrey
     i
         color: $text
     &__username
@@ -98,6 +104,8 @@
         border: none
         border-radius: 10px
         resize: none
+        &:focus
+            border: none
     &__button
         margin-left: 20px
         width: 60px

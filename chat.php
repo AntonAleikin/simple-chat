@@ -65,13 +65,13 @@
                 <div class="right-bar">
                     
                     <!-- Диалоговое окно -->
-                    <div class="dialogue-frame">
+                    <!-- <div class="dialogue-frame">
 
-                        <!-- Обертка, которая держит смс внизу окна -->
+                        Обертка, которая держит смс внизу окна
                         <div class="dialogue-frame-wrapper">
 
 
-                            <!-- Обертка для смс, чтобы занимали весь экран как блок -->
+                            Обертка для смс, чтобы занимали весь экран как блок
                             <div class="dialogue-frame__message-wrapper-right">
 
                                 <div class="dialogue-frame__message">
@@ -81,27 +81,27 @@
                                 </div>
                             </div>
 
-                            <!-- СМС опонента слева и другого цвета -->
-                            <!-- <div class="dialogue-frame__message-wrapper-left">
+                            СМС опонента слева и другого цвета
+                            <div class="dialogue-frame__message-wrapper-left">
 
                                 <div class="dialogue-frame__message">
 
                                     <div class="dialogue-frame__message-text">Привет!</div>
                                     <div class="dialogue-frame__message-time">11:51</div>
                                 </div>
-                            </div> -->
+                            </div>
 
                             
                         </div>
-                    </div>
+                    </div> -->
 
 
-                    <form class="send-message">
+                    <!-- <form class="send-message">
 
                         <textarea required placeholder="Введите ваше сообщение" name="sms" type="text" class="send-message__input"></textarea>
 
                         <button class="send-message__button"><i class="fas fa-paper-plane"></i></button>
-                    </form>
+                    </form> -->
                 </div>
             </div>
 
