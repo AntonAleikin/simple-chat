@@ -1,16 +1,4 @@
-/* 
-Все делаем с помощью классов!
-При поиске пользователя отправляем запрос в базу и возвращаем юзернейм, если он есть и если верифицирован.
-Берем юзернейм и записываем его в  id? и отображаем в верстке возле иконки. 
-
-При клике добавляем собеседнику класс companion под розмещение смс слева. 
-
-
-*/
-
-
 "use strict";
-
 
 // Взаимодействие с пользователями 
 function userInteractive() {
@@ -40,6 +28,18 @@ function userInteractive() {
         }
 
 
+        // Добавляем прокрутку диалоговому окну, если много смс
+        smsScroll(dialogueFrame, dialogueFrameWrapper) {
+                
+            if (dialogueFrameWrapper.clientHeight >= dialogueFrame.clientHeight) {
+        
+                dialogueFrameWrapper.classList.add('dialogue-frame-wrapper-scroll');
+                // Мотаем чат в самый низ (к новым смс)
+                dialogueFrame.scrollTop = dialogueFrame.scrollHeight - dialogueFrame.clientHeight;        
+            }
+        }
+
+
         // Активация чата При клике на пользователя
         activateChat(eventTarget, delitionBin) {
 
@@ -50,9 +50,6 @@ function userInteractive() {
             }
 
 
-            // Загружаем последнии 20 смс из истории переписки
-            this.loadSms();
-            
 
             const rightBar = document.querySelector('.right-bar'),
             rightBarEmpty = document.querySelector('.right-bar-empty');
@@ -67,19 +64,18 @@ function userInteractive() {
 
             // Создаем новое диалоговое окно 
             const dialogueFrame = document.createElement('div');
-            dialogueFrame.id = this.companion;
+            dialogueFrame.id = this.dialogueId;
             dialogueFrame.dataset.companion = this.companion;
             dialogueFrame.classList.add('dialogue-frame');
             dialogueFrame.innerHTML = `
 
-                <div id="${this.companion}" data-companion="${this.companion}" class="dialogue-frame-wrapper"></div>
+                <div data-companion="${this.companion}" class="dialogue-frame-wrapper"></div>
             `;
             rightBar.append(dialogueFrame);
 
 
             // Создаем форму отправки смс
             const sendSmsForm = document.createElement('form');
-            sendSmsForm.id = this.companion;
             sendSmsForm.dataset.companion = this.companion;
             sendSmsForm.classList.add('send-message');
             sendSmsForm.innerHTML = `
@@ -91,24 +87,24 @@ function userInteractive() {
             `;
             rightBar.append(sendSmsForm);
 
+            
+            // Загружаем последнии 20 смс из истории переписки
+            this.loadSms(dialogueFrame);
+        
+
+            // Добавляем прокрутку смскам. Сначала проверяем изменения в DOM с помощью MutationObserver
+            const DOMmutations = new MutationObserver((mutation) => {
+
+                this.smsScroll(dialogueFrame, dialogueFrame.firstElementChild);
+
+            }).observe(dialogueFrame.firstElementChild, {childList: true});
+
+
 
             // включаем отправку смс
             this.sendMessage(sendSmsForm, dialogueFrame);
             
-
-            // Добавляем прокрутку смскам
-            function smsScroll(dialogueFrame, dialogueFrameWrapper) {
             
-                if (dialogueFrameWrapper.clientHeight >= dialogueFrame.clientHeight) {
-            
-                    dialogueFrameWrapper.classList.toggle('dialogue-frame-wrapper-scroll');
-                    // Мотаем чат в самый низ (к новым смс)
-                    dialogueFrame.scrollTop = dialogueFrame.scrollHeight - dialogueFrame.clientHeight;        
-                }
-            }
-            smsScroll(dialogueFrame ,dialogueFrame.firstElementChild);
-
-
 
             // Удаляем диалоговое окно вместе с иконкой пользователя
             delitionBin.addEventListener("click", (e) => {
@@ -129,14 +125,9 @@ function userInteractive() {
         } 
 
 
-
+        
         // Загружаем историю переписки
-        loadSms() {
-
-            /* const companionData = {
-                'companion': this.companion,
-                'dialogueId': this.dialogueId
-            }; */
+        loadSms(dialogueFrame) {
 
             fetch('php/load_sms.php', {
                 method: "POST",
@@ -149,6 +140,12 @@ function userInteractive() {
             .then(loadedSms => {
 
                 console.log(loadedSms);
+
+                loadedSms.forEach((sms) => {
+
+                    this.renderSms(dialogueFrame.firstElementChild, 
+                    sms.username, sms.text, sms.time);
+                });
             });
         }
 
@@ -186,8 +183,16 @@ function userInteractive() {
                     }
 
                     // Запускаем ф-цию рендеринга смс
-                    this.renderSms(dialogueFrame.firstElementChild ,smsData.text, smsData.time);
+                    this.renderSms(dialogueFrame.firstElementChild, smsData.username ,smsData.text, smsData.time);
                     sendSmsForm.reset();
+
+
+                    // Добавляем прокрутку смскам. Сначала проверяем изменения в DOM с помощью MutationObserver
+                    const DOMmutations = new MutationObserver(() => {
+
+                        this.smsScroll(dialogueFrame, dialogueFrame.firstElementChild);
+
+                    }).observe(dialogueFrame.firstElementChild, {childList: true});
 
                     console.log(smsData); 
                 });
@@ -195,23 +200,38 @@ function userInteractive() {
         }
 
 
-        // Рендерим свои смс внутри dialogue-frame-wrapper 
-        renderSms(dialogueFrameWrapper ,sms, time) {
+        // Рендерим смс внутри dialogue-frame-wrapper 
+        renderSms(dialogueFrameWrapper, username ,sms, time) {
+            
+            // Проверяем, кто отправитель и тому ренерим
+            if (username == this.companion) {
 
-            //if ()
+                const companionSms = document.createElement('div');
+                companionSms.classList.add('dialogue-frame__message-wrapper-left');
+                companionSms.innerHTML = `
 
+                    <div class="dialogue-frame__message" data-dialogueId = "${this.dialogueId}">
 
-            const mySms = document.createElement('div');
-            mySms.classList.add('dialogue-frame__message-wrapper-right');
-            mySms.innerHTML = `
+                        <div class="dialogue-frame__message-text">${sms}</div>
+                        <div class="dialogue-frame__message-time">${time}</div>
+                    </div>
+                `;     
+                dialogueFrameWrapper.append(companionSms);
+                           
+            } else {
 
-                <div class="dialogue-frame__message" data-dialogueId = "${this.dialogueId}">
-                                        
-                    <div class="dialogue-frame__message-text">${sms}</div>
-                    <div class="dialogue-frame__message-time">${time}</div>
-                </div>
-            `;
-            dialogueFrameWrapper.append(mySms);
+                const mySms = document.createElement('div');
+                mySms.classList.add('dialogue-frame__message-wrapper-right');
+                mySms.innerHTML = `
+
+                    <div class="dialogue-frame__message" data-dialogueId = "${this.dialogueId}">
+                                            
+                        <div class="dialogue-frame__message-text">${sms}</div>
+                        <div class="dialogue-frame__message-time">${time}</div>
+                    </div>
+                `;
+                dialogueFrameWrapper.append(mySms);
+            }
         }
 
 

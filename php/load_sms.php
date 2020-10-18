@@ -4,4 +4,4 @@ include "./includes/chat_action.php";
 $loadSms = new chatAction();
 $loadSms->getRequest();
 $loadSms->loadSms($_POST);
-//$loadSms->response();
+$loadSms->response($GLOBALS['loaded_sms']);

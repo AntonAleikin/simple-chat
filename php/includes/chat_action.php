@@ -107,7 +107,7 @@ class chatAction {
 
             // Получаем id диалога, время и текст только что положеной в базу смс
             $getSmsData = mysqli_fetch_assoc(
-            mysqli_query($connection, "SELECT `dialogue_id`, `time`, `text` FROM `sms` WHERE `text` = '$this->sms'
+            mysqli_query($connection, "SELECT `dialogue_id`, `username`, `time`, `text` FROM `sms` WHERE `text` = '$this->sms'
             ORDER BY time DESC LIMIT 1")
             );
 
@@ -116,6 +116,7 @@ class chatAction {
             // Записываем все данные смс в объект (ассоц массив) и отправляем клиенту
             $smsData = [
                 'dialogueId' => $getSmsData['dialogue_id'],
+                'username' => $getSmsData['username'],
                 'time' => date('H:i', time() - (time() - strtotime($getSmsData['time']))), // Преобразовываем дату из базы в часы и минуты
                 'text' => $getSmsData['text']
             ]; 
@@ -147,6 +148,7 @@ class chatAction {
 
         // Отоброжаем строку таблицы как ассоц массив с каждым таким диалогом, пока они не закончатся 
         while ($arr = mysqli_fetch_assoc($activeDialogues)) {
+
             
             //Перебираем єлемы полученной строки и записываем id и companion в объект (ассоц массив) $companionsRow
             foreach ($arr as $colName => $value) {
@@ -188,13 +190,12 @@ class chatAction {
 
         while ($rows = mysqli_fetch_assoc($getSms)) {
 
+            // Меняем формат времени
+            $rows['time'] = date('H:i', time() - (time() - strtotime($rows['time'])));
+
             // Добавляем в начало массива каждую строку из таблицы в виде объекта
             array_unshift($loadedSms, $rows);
         }
-        //rint_r($loadedSms);
-        exit(json_encode($loadedSms));
-
-
-        // Нужно еще добавить Наш юзернейм для распознавания нас!!!
+        $GLOBALS['loaded_sms'] = $loadedSms;
     }
 }

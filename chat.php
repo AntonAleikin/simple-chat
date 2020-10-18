@@ -46,14 +46,7 @@
                         <button class="user-search__button"><i class="fas fa-search"></i></button>
                     </form>
 
-
-                    <!-- Найденные пользователи -->
-                    <!-- <div class="searched-user">
-
-                        <i class="fas fa-user searched-user__icon"></i>
-                        <div class="searched-user__username">klass</div>
-                        <i class="fas fa-trash searched-user__delete"></i>
-                    </div> -->
+                    
                 </div>
 
 
@@ -64,44 +57,7 @@
 
                 <div class="right-bar">
                     
-                    <!-- Диалоговое окно -->
-                    <!-- <div class="dialogue-frame">
-
-                        Обертка, которая держит смс внизу окна
-                        <div class="dialogue-frame-wrapper">
-
-
-                            Обертка для смс, чтобы занимали весь экран как блок
-                            <div class="dialogue-frame__message-wrapper-right">
-
-                                <div class="dialogue-frame__message">
-                                    
-                                    <div class="dialogue-frame__message-text">Привет!</div>
-                                    <div class="dialogue-frame__message-time">11:51</div>
-                                </div>
-                            </div>
-
-                            СМС опонента слева и другого цвета
-                            <div class="dialogue-frame__message-wrapper-left">
-
-                                <div class="dialogue-frame__message">
-
-                                    <div class="dialogue-frame__message-text">Привет!</div>
-                                    <div class="dialogue-frame__message-time">11:51</div>
-                                </div>
-                            </div>
-
-                            
-                        </div>
-                    </div> -->
-
-
-                    <!-- <form class="send-message">
-
-                        <textarea required placeholder="Введите ваше сообщение" name="sms" type="text" class="send-message__input"></textarea>
-
-                        <button class="send-message__button"><i class="fas fa-paper-plane"></i></button>
-                    </form> -->
+                    
                 </div>
             </div>
 
